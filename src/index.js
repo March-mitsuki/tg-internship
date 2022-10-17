@@ -1,9 +1,13 @@
 // dependencies lib
 import got from "got";
+import { createWriteStream } from "node:fs";
+import {promisify} from 'node:util';
+import stream from 'node:stream';
 
 // local dependencies
 import { BEARER_TOKEN } from "./env-setting.js";
 
+const pipeline = promisify(stream.pipeline);
 
 const rulesURL = "https://api.twitter.com/2/tweets/search/stream/rules";
 const streamURL = "https://api.twitter.com/2/tweets/search/stream";
@@ -14,7 +18,7 @@ const rules = [{
 }]
 
 const setRules = async () => {
-  console.log("set rules called");
+  console.log("[log]set rules called");
   const data = {
     "add": rules
   }
@@ -31,7 +35,7 @@ const setRules = async () => {
 }
 
 const getAllRules = async () => {
-  console.log("get all rules called");
+  console.log("[log]get all rules called");
   const response = await got.get(rulesURL, {
     headers: {
       "authorization": `Bearer ${BEARER_TOKEN}`
@@ -62,9 +66,34 @@ const delAllRules = async (rules) => {
   return body
 }
 
+const streamConnect = () => {
+  console.log("[log]stream connect called");
+  const stream = got.stream(streamURL, {
+    headers: {
+      "User-Agent": "v2FilterStreamJS",
+      "Authorization": `Bearer ${BEARER_TOKEN}`
+    }
+  })
+  stream.on("data", async (data) => {
+    try {
+      console.log("[log]on stream data: ", JSON.parse(data));
+      // await pipeline(
+      //   stream,
+      //   createWriteStream(process.stdout)
+      // )
+      console.log("[log]readable success");
+    } catch (err) {
+      console.log("[error]", err);
+    }
+  })
+  stream.once("error", err => console.log("[error]", err))
+  stream.on("end", () => console.log("[log]stream end"))
+}
+
 const main = async () => {
   // const setRulesRes = await setRules()
   const getRulesRes = await getAllRules()
+  streamConnect()
   return
 }
 
