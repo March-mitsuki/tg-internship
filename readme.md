@@ -1,5 +1,5 @@
 ## how to use
-* root dirの中に.envファイルと作り、中に`BEARER_TOKEN`というkeyを定義してください
+* root dirの中に.envファイルを作り、中に`BEARER_TOKEN`というkeyを定義してください
 ```
 # .env file
 BEARER_TOKEN=your_scret_key

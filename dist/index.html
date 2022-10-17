@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="page_name">
+    Home Page
+  </div>
+  <form id="twitter_stream">
+    <input type="text" name="stag" placeholder="tag">
+    <input type="text" name="svalue" placeholder="value">
+    <button type="submit">Submit</button>
+  </form>
+  <button id="start_monitor_fmt">Start Monitor</button>
+</body>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  var socket = io();
+  const display = document.getElementById("display")
+  const form = document.getElementById("twitter_stream")
+  socket.on("connection", () => {
+    console.log("client socket connection");
+  })
+  form.addEventListener("submit", (e) => {
+    e.preventDefault()
+    const postData = {
+      tag: form.stag.value,
+      value: form.svalue.value
+    }
+    socket.emit("change_rules", postData)
+    form.stag.value = ""
+    form.svalue.value = ""
+  })
+
+  socket.on("recive_rules", (data) => {
+    console.log(data)
+  })
+
+  const startBtn = document.getElementById("start_monitor_fmt")
+  startBtn.addEventListener("click", (e) => {
+    e.preventDefault()
+    socket.emit("start_monitor_fmt")
+  })
+  socket.on("data_recive", (data) => {
+    console.log(data)
+  })
+</script>
+</html>
