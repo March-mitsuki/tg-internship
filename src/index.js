@@ -14,11 +14,6 @@ const program = new Command()
 const rulesURL = "https://api.twitter.com/2/tweets/search/stream/rules";
 const streamURL = "https://api.twitter.com/2/tweets/search/stream";
 
-// const rules = [{
-//   "value": "cat has:images",
-//   "tag": "cat with images",
-// }]
-
 const setRules = async ({tag, value}) => {
   console.log("[log]set rules called");
   const rules = [{
