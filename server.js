@@ -5,6 +5,9 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { Server } from "socket.io";
 
+// local dependencies
+import { tfs } from './controlelrs/index.js';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -20,8 +23,32 @@ app.get("/", (req, res) => {
 
 io.on("connection", (socket) => {
   console.log("a user connection: ", socket.id);
-  socket.on("change_rules", (data) => {
-    console.log(data)
+  socket.on("change_rules", async (data) => {
+    // console.log(data)
+    const tag = data.tag
+    const valueStr = data.value
+    const keywords = valueStr.split(" ")
+    const value = keywords.join(" OR ") + ` lang:jp`
+    const resBody = await tfs.setRules({tag: tag, value: value})
+    socket.emit("recive_rules", resBody)
+  })
+  socket.on("start_monitor_fmt", () => {
+    console.log("server start monitor");
+    const stream = tfs.streamConnect()
+    stream.on("data", async (data) => {
+      try {
+        const dataObj = JSON.parse(data)
+        socket.emit("data_recive", `
+          \n
+          ---twitter: ${dataObj.data.text} \n
+          |--tag: ${dataObj.matching_rules[0].tag} \n
+        `)
+      } catch (err) {
+        console.log("[error]", err);
+      }
+    })
+    stream.once("error", err => console.log("[error]", err))
+    stream.once("end", () => console.log("[log]stream end"))
   })
 })
 
