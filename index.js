@@ -8,7 +8,7 @@ import dotenv from "dotenv"
 
 dotenv.config()
 
-console.log("now env is: ", process.env.BEARER_TOKEN);
+const BEARER_TOKEN =  process.env.BEARER_TOKEN
 
 const pipeline = promisify(stream.pipeline);
 const program = new Command()
