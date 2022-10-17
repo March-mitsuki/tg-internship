@@ -77,17 +77,17 @@ const streamConnect = () => {
   stream.on("data", async (data) => {
     try {
       console.log("[log]on stream data: ", JSON.parse(data));
-      // await pipeline(
-      //   stream,
-      //   createWriteStream(process.stdout)
-      // )
+      await pipeline(
+        stream,
+        createWriteStream("./readStream.log")
+      )
       console.log("[log]readable success");
     } catch (err) {
       console.log("[error]", err);
     }
   })
   stream.once("error", err => console.log("[error]", err))
-  stream.on("end", () => console.log("[log]stream end"))
+  stream.once("end", () => console.log("[log]stream end"))
 }
 
 const main = async () => {
