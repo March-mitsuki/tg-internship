@@ -4,9 +4,11 @@ import { createWriteStream } from "node:fs";
 import {promisify} from 'node:util';
 import stream from 'node:stream';
 import { Command } from "commander";
+import dotenv from "dotenv"
 
-// local dependencies
-import { BEARER_TOKEN } from "./env-setting.js";
+dotenv.config()
+
+console.log("now env is: ", process.env.BEARER_TOKEN);
 
 const pipeline = promisify(stream.pipeline);
 const program = new Command()
