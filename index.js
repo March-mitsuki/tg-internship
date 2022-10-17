@@ -128,7 +128,6 @@ program.command("set-rules")
   .action((inputData) => {
     const value = inputData.value
     const tag = inputData.tag
-    // console.log({tag: tag, value: value});
     setRules({tag: tag, value: value})
   })
 
@@ -146,8 +145,7 @@ program.command("set-keyword-rules")
     const tag = inputData.tag
     const keywords = keywordStr.split(" ")
     const value = keywords.join(" OR ") + ` lang:${lang}`
-    console.log({tag: tag, value: value});
-    // setRules({tag: tag, value: value})
+    setRules({tag: tag, value: value})
   })
 
 program.command("del-rules")
