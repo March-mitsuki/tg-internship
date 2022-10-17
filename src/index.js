@@ -3,22 +3,28 @@ import got from "got";
 import { createWriteStream } from "node:fs";
 import {promisify} from 'node:util';
 import stream from 'node:stream';
+import { Command } from "commander";
 
 // local dependencies
 import { BEARER_TOKEN } from "./env-setting.js";
 
 const pipeline = promisify(stream.pipeline);
+const program = new Command()
 
 const rulesURL = "https://api.twitter.com/2/tweets/search/stream/rules";
 const streamURL = "https://api.twitter.com/2/tweets/search/stream";
 
-const rules = [{
-  "value": "cat has:images",
-  "tag": "cat with images",
-}]
+// const rules = [{
+//   "value": "cat has:images",
+//   "tag": "cat with images",
+// }]
 
-const setRules = async () => {
+const setRules = async ({tag, value}) => {
   console.log("[log]set rules called");
+  const rules = [{
+    "value": value,
+    "tag": tag,
+  }]
   const data = {
     "add": rules
   }
@@ -47,7 +53,8 @@ const getAllRules = async () => {
   return body
 }
 
-const delAllRules = async (rules) => {
+const delAllRules = async () => {
+  const rules = await getAllRules()
   const ids = rules.data.map(elem => elem.id);
   const data = {
     "delete": {
@@ -90,11 +97,30 @@ const streamConnect = () => {
   stream.once("end", () => console.log("[log]stream end"))
 }
 
-const main = async () => {
-  // const setRulesRes = await setRules()
-  const getRulesRes = await getAllRules()
-  streamConnect()
-  return
-}
+program.command("set-rules")
+  .option("--value <char>", "set the value of rules")
+  .option("--tag <char>", "set the description of the value")
+  .action((inputData) => {
+    console.log(inputData);
+    const value = inputData.value
+    const tag = inputData.tag
+    console.log(value, "||", tag);
+    setRules({tag: tag, value: value})
+  })
 
-main()
+program.command("del-rules")
+  .action(() => {
+    delAllRules()
+  })
+
+program.command("get-rules")
+  .action(() => {
+    getAllRules()
+  })
+
+program.command("conn-stream")
+  .action(() => {
+    streamConnect()
+  })
+
+program.parse()
